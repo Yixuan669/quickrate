@@ -42,15 +42,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Placeholder rates: 1 SGD = x of each currency.
-// Still used by the screens; will be removed once they read from the ViewModel.
-val fakeRates = mapOf(
-    "CNY" to 5.25,
-    "USD" to 0.78,
-    "MYR" to 3.30,
-    "AUD" to 1.18
-)
-
 // Returns the current time as text, e.g. "14:05:32"
 fun currentTime(): String =
     SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
@@ -94,6 +85,7 @@ fun UtilityApp(
                 )
 
                 "Settings" -> SettingsScreen(
+                    currencies = uiState.rates.keys.toList(),
                     targetCurrency = uiState.targetCurrency,
                     onCurrencySelected = { viewModel.selectCurrency(it) },
                     decimalPlaces = uiState.decimalPlaces,

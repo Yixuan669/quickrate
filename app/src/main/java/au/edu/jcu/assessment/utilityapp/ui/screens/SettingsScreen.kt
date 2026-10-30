@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import au.edu.jcu.assessment.utilityapp.fakeRates
 import au.edu.jcu.assessment.utilityapp.ui.components.currencyFlag
 
 /**
@@ -22,6 +21,7 @@ import au.edu.jcu.assessment.utilityapp.ui.components.currencyFlag
  */
 @Composable
 fun SettingsScreen(
+    currencies: List<String>,
     targetCurrency: String,
     onCurrencySelected: (String) -> Unit,
     decimalPlaces: Int,
@@ -37,7 +37,7 @@ fun SettingsScreen(
 
         // Section 1: which currency to show as the main rate
         Text("Main currency to show:", style = MaterialTheme.typography.titleMedium)
-        fakeRates.keys.forEach { code ->
+        currencies.forEach { code ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = code == targetCurrency,
