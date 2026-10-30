@@ -9,13 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -32,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import au.edu.jcu.assessment.utilityapp.ui.screens.UtilityScreen
 import au.edu.jcu.assessment.utilityapp.ui.theme.MobileTech_UtilityAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -103,51 +101,6 @@ fun UtilityApp() {
                     onCurrencySelected = { targetCurrency = it }
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun UtilityScreen(targetCurrency: String) {
-    var lastUpdated by remember { mutableStateOf(currentTime()) }
-    val mainRate = fakeRates[targetCurrency] ?: 0.0
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text("QuickRate", style = MaterialTheme.typography.headlineMedium)
-
-        // Main "at a glance" information: the rate the user cares about most
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Text("1 SGD =", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "%.2f %s".format(mainRate, targetCurrency),
-                    style = MaterialTheme.typography.displayMedium
-                )
-                Text(
-                    "Last updated: $lastUpdated",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-
-        // Secondary information: the other currencies, in smaller text
-        Text("Other currencies", style = MaterialTheme.typography.titleMedium)
-        fakeRates
-            .filterKeys { it != targetCurrency }
-            .forEach { (code, rate) ->
-                Text(
-                    "1 SGD = %.2f %s".format(rate, code),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-
-        Button(onClick = { lastUpdated = currentTime() }) {
-            Text("Refresh")
         }
     }
 }
