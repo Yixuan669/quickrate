@@ -86,9 +86,13 @@ fun UtilityApp(
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
                 "Utility" -> UtilityScreen(
+                    rates = uiState.rates,
                     targetCurrency = uiState.targetCurrency,
+                    lastUpdated = uiState.lastUpdated,
+                    onRefresh = { viewModel.refreshRates() },
                     decimalPlaces = uiState.decimalPlaces
                 )
+
                 "Settings" -> SettingsScreen(
                     targetCurrency = uiState.targetCurrency,
                     onCurrencySelected = { viewModel.selectCurrency(it) },

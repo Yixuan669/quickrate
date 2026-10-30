@@ -16,29 +16,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import au.edu.jcu.assessment.utilityapp.currentTime
-import au.edu.jcu.assessment.utilityapp.fakeRates
 import au.edu.jcu.assessment.utilityapp.ui.components.CurrencyRow
 import au.edu.jcu.assessment.utilityapp.ui.components.RateCard
 
 /**
  * Main screen: shows the selected exchange rate "at a glance",
  * plus the other currencies in a list below.
+ * It holds no state itself; everything comes from the ViewModel.
  */
 @Composable
 fun UtilityScreen(
+    rates: Map<String, Double>,
     targetCurrency: String,
+    lastUpdated: String,
+    onRefresh: () -> Unit,
     decimalPlaces: Int = 2
 ) {
-    var lastUpdated by remember { mutableStateOf(currentTime()) }
-    val mainRate = fakeRates[targetCurrency] ?: 0.0
-    val otherRates = fakeRates.filterKeys { it != targetCurrency }
+    val mainRate = rates[targetCurrency] ?: 0.0
+    val otherRates = rates.filterKeys { it != targetCurrency }
 
     Column(
         modifier = Modifier
@@ -75,7 +72,7 @@ fun UtilityScreen(
         }
 
         Button(
-            onClick = { lastUpdated = currentTime() },
+            onClick = onRefresh,
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
