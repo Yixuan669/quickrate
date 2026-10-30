@@ -32,7 +32,10 @@ import au.edu.jcu.assessment.utilityapp.ui.components.RateCard
  * plus the other currencies in a list below.
  */
 @Composable
-fun UtilityScreen(targetCurrency: String) {
+fun UtilityScreen(
+    targetCurrency: String,
+    decimalPlaces: Int = 2
+) {
     var lastUpdated by remember { mutableStateOf(currentTime()) }
     val mainRate = fakeRates[targetCurrency] ?: 0.0
     val otherRates = fakeRates.filterKeys { it != targetCurrency }
@@ -50,7 +53,8 @@ fun UtilityScreen(targetCurrency: String) {
             baseCurrency = "SGD",
             targetCurrency = targetCurrency,
             rate = mainRate,
-            lastUpdated = lastUpdated
+            lastUpdated = lastUpdated,
+            decimalPlaces = decimalPlaces
         )
 
         // Secondary information: the other currencies, separated by dividers
@@ -60,6 +64,7 @@ fun UtilityScreen(targetCurrency: String) {
                 CurrencyRow(
                     code = code,
                     rate = rate,
+                    decimalPlaces = decimalPlaces,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
                 // Draw a line between rows, but not after the last one

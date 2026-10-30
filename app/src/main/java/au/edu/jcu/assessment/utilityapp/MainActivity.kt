@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,6 +69,9 @@ fun UtilityApp() {
     // Shared state: chosen on the Settings screen, displayed on the Utility screen
     var targetCurrency by remember { mutableStateOf("CNY") }
 
+    // Shared state: chosen on the Settings screen, used by the Utility screen
+    var decimalPlaces by remember { mutableIntStateOf(2) }
+
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -88,10 +92,15 @@ fun UtilityApp() {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
-                "Utility" -> UtilityScreen(targetCurrency = targetCurrency)
+                "Utility" -> UtilityScreen(
+                    targetCurrency = targetCurrency,
+                    decimalPlaces = decimalPlaces
+                )
                 "Settings" -> SettingsScreen(
                     targetCurrency = targetCurrency,
-                    onCurrencySelected = { targetCurrency = it }
+                    onCurrencySelected = { targetCurrency = it },
+                    decimalPlaces = decimalPlaces,
+                    onDecimalPlacesSelected = { decimalPlaces = it }
                 )
             }
         }

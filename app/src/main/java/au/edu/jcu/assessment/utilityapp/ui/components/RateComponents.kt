@@ -41,7 +41,8 @@ fun RateCard(
     targetCurrency: String,
     rate: Double,
     lastUpdated: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    decimalPlaces: Int = 2
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -62,7 +63,7 @@ fun RateCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "%.2f %s".format(rate, targetCurrency),
+                    "%.${decimalPlaces}f %s".format(rate, targetCurrency),
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -83,7 +84,8 @@ fun RateCard(
 fun CurrencyRow(
     code: String,
     rate: Double,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    decimalPlaces: Int = 2
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -97,7 +99,7 @@ fun CurrencyRow(
             modifier = Modifier.weight(1f)
         )
         Text(
-            "%.2f".format(rate),
+            "%.${decimalPlaces}f".format(rate),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold
         )
