@@ -15,13 +15,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import au.edu.jcu.assessment.utilityapp.ui.QuickRateViewModel
 import au.edu.jcu.assessment.utilityapp.ui.screens.SettingsScreen
 import au.edu.jcu.assessment.utilityapp.ui.screens.UtilityScreen
 import au.edu.jcu.assessment.utilityapp.ui.theme.MobileTech_UtilityAppTheme
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
 }
 
 // Placeholder rates: 1 SGD = x of each currency.
-// These will be replaced with live data from a web API in Week 5.
+// Still used by the screens; will be removed once they read from the ViewModel.
 val fakeRates = mapOf(
     "CNY" to 5.25,
     "USD" to 0.78,
@@ -54,23 +55,15 @@ val fakeRates = mapOf(
 fun currentTime(): String =
     SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
-@Preview(showBackground = true)
 @Composable
-fun UtilityAppPreview() {
-    MobileTech_UtilityAppTheme {
-        UtilityApp()
-    }
-}
-
-@Composable
-fun UtilityApp() {
+fun UtilityApp(
+    viewModel: QuickRateViewModel = viewModel(factory = QuickRateViewModel.Factory)
+) {
+    // Which tab is showing is pure UI state, so it stays here
     var selectedTab by remember { mutableStateOf("Utility") }
 
-    // Shared state: chosen on the Settings screen, displayed on the Utility screen
-    var targetCurrency by remember { mutableStateOf("CNY") }
-
-    // Shared state: chosen on the Settings screen, used by the Utility screen
-    var decimalPlaces by remember { mutableIntStateOf(2) }
+    // App data now comes from the ViewModel
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -93,14 +86,14 @@ fun UtilityApp() {
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
                 "Utility" -> UtilityScreen(
-                    targetCurrency = targetCurrency,
-                    decimalPlaces = decimalPlaces
+                    targetCurrency = uiState.targetCurrency,
+                    decimalPlaces = uiState.decimalPlaces
                 )
                 "Settings" -> SettingsScreen(
-                    targetCurrency = targetCurrency,
-                    onCurrencySelected = { targetCurrency = it },
-                    decimalPlaces = decimalPlaces,
-                    onDecimalPlacesSelected = { decimalPlaces = it }
+                    targetCurrency = uiState.targetCurrency,
+                    onCurrencySelected = { viewModel.selectCurrency(it) },
+                    decimalPlaces = uiState.decimalPlaces,
+                    onDecimalPlacesSelected = { viewModel.selectDecimalPlaces(it) }
                 )
             }
         }
