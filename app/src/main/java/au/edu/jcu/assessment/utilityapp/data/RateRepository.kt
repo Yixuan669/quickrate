@@ -25,3 +25,21 @@ class FakeRateRepository : RateRepository {
         "AUD" to 1.18
     )
 }
+
+/**
+ * Repository that gets live exchange rates from the Frankfurter web API.
+ */
+class NetworkRateRepository(
+    private val apiService: ExchangeRateApiService
+) : RateRepository {
+
+    override suspend fun getRates(base: String): Map<String, Double> =
+        apiService
+            .getRates(base = base, quotes = SUPPORTED_CURRENCIES.joinToString(","))
+            .associate { it.quote to it.rate }
+
+    companion object {
+        /** The currencies this app shows. */
+        val SUPPORTED_CURRENCIES = listOf("CNY", "USD", "MYR", "AUD")
+    }
+}
