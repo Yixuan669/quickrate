@@ -81,7 +81,9 @@ fun UtilityApp(
                     targetCurrency = uiState.targetCurrency,
                     lastUpdated = uiState.lastUpdated,
                     onRefresh = { viewModel.refreshRates() },
-                    decimalPlaces = uiState.decimalPlaces
+                    decimalPlaces = uiState.decimalPlaces,
+                    isLoading = uiState.isLoading,
+                    errorMessage = uiState.errorMessage
                 )
 
                 "Settings" -> SettingsScreen(

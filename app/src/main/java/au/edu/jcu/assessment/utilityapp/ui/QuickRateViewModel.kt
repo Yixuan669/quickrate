@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
+import retrofit2.HttpException
 
 /**
  * Everything the UI needs to display, kept in one place.
@@ -22,7 +24,9 @@ data class QuickRateUiState(
     val rates: Map<String, Double> = emptyMap(),
     val targetCurrency: String = "CNY",
     val decimalPlaces: Int = 2,
-    val lastUpdated: String = ""
+    val lastUpdated: String = "",
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )
 
 /**
@@ -43,8 +47,30 @@ class QuickRateViewModel(
     /** Asks the repository for the latest rates and records the time. */
     fun refreshRates() {
         viewModelScope.launch {
-            val rates = rateRepository.getRates("SGD")
-            _uiState.update { it.copy(rates = rates, lastUpdated = currentTime()) }
+            // Show the loading indicator and clear any old error
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                val rates = rateRepository.getRates("SGD")
+                _uiState.update {
+                    it.copy(rates = rates, lastUpdated = currentTime(), isLoading = false)
+                }
+            } catch (e: IOException) {
+                // No internet, or the connection dropped
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Could not load rates. Please check your internet connection."
+                    )
+                }
+            } catch (e: HttpException) {
+                // The website answered with an error (e.g. 500)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "The exchange rate service is unavailable. Please try again later."
+                    )
+                }
+            }
         }
     }
 
