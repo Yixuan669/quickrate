@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.edu.jcu.assessment.utilityapp.ui.theme.MobileTech_UtilityAppTheme
+import androidx.compose.ui.graphics.Color
 
 /**
  * Returns a flag emoji for a currency code,
@@ -42,7 +43,8 @@ fun RateCard(
     rate: Double,
     lastUpdated: String,
     modifier: Modifier = Modifier,
-    decimalPlaces: Int = 2
+    decimalPlaces: Int = 2,
+    previousRate: Double? = null
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -66,6 +68,21 @@ fun RateCard(
                     "%.${decimalPlaces}f %s".format(rate, targetCurrency),
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold
+                )
+            }
+            // Daily change compared with the previous available day
+            if (previousRate != null && previousRate != 0.0) {
+                val changePercent = (rate - previousRate) / previousRate * 100
+                val (arrow, colour) = when {
+                    changePercent > 0 -> "▲" to Color(0xFF2E7D32)   // green: SGD buys more
+                    changePercent < 0 -> "▼" to MaterialTheme.colorScheme.error // red: SGD buys less
+                    else -> "■" to MaterialTheme.colorScheme.onPrimaryContainer
+                }
+                Text(
+                    "$arrow %+.2f%% vs previous day".format(changePercent),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colour
                 )
             }
             Text(

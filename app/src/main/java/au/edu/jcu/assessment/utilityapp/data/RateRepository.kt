@@ -1,9 +1,13 @@
 package au.edu.jcu.assessment.utilityapp.data
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
 /**
  * Repository: the single place the app gets exchange rates from.
  * The rest of the app only talks to this interface, so the data source
- * can be swapped later (placeholder data now, web API in Week 5).
+ * can be swapped (placeholder data or the web API).
  */
 interface RateRepository {
     /**
@@ -11,11 +15,17 @@ interface RateRepository {
      * e.g. for base "SGD": "CNY" to 5.25, "USD" to 0.78.
      */
     suspend fun getRates(base: String): Map<String, Double>
+
+    /**
+     * Returns the rates from the previous available day,
+     * so the app can show whether each rate went up or down.
+     */
+    suspend fun getPreviousRates(base: String): Map<String, Double>
 }
 
 /**
- * Temporary repository that returns placeholder rates.
- * Will be replaced by a network repository in Week 5.
+ * Repository that returns placeholder rates.
+ * Useful for testing without an internet connection.
  */
 class FakeRateRepository : RateRepository {
     override suspend fun getRates(base: String): Map<String, Double> = mapOf(
@@ -23,6 +33,13 @@ class FakeRateRepository : RateRepository {
         "USD" to 0.78,
         "MYR" to 3.30,
         "AUD" to 1.18
+    )
+
+    override suspend fun getPreviousRates(base: String): Map<String, Double> = mapOf(
+        "CNY" to 5.20,
+        "USD" to 0.79,
+        "MYR" to 3.30,
+        "AUD" to 1.17
     )
 }
 
@@ -37,6 +54,30 @@ class NetworkRateRepository(
         apiService
             .getRates(base = base, quotes = SUPPORTED_CURRENCIES.joinToString(","))
             .associate { it.quote to it.rate }
+
+    override suspend fun getPreviousRates(base: String): Map<String, Double> {
+        // Ask for the last week, so weekends and holidays (no new rates) are covered
+        val history = apiService.getRateHistory(
+            base = base,
+            quotes = SUPPORTED_CURRENCIES.joinToString(","),
+            from = daysAgo(7)
+        )
+        // For each currency, sort by date and take the second-newest rate
+        return history
+            .groupBy { it.quote }
+            .mapNotNull { (quote, items) ->
+                val sorted = items.sortedBy { it.date }
+                if (sorted.size >= 2) quote to sorted[sorted.size - 2].rate else null
+            }
+            .toMap()
+    }
+
+    /** Returns the date [days] days ago as text, e.g. "2026-10-24". */
+    private fun daysAgo(days: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -days)
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(calendar.time)
+    }
 
     companion object {
         /** The currencies this app shows. */

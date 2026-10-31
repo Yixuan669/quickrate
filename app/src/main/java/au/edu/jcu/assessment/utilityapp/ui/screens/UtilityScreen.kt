@@ -41,7 +41,8 @@ fun UtilityScreen(
     onRefresh: () -> Unit,
     decimalPlaces: Int = 2,
     isLoading: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    previousRates: Map<String, Double> = emptyMap()
 ) {
     val mainRate = rates[targetCurrency]
     val otherRates = rates.filterKeys { it != targetCurrency }
@@ -76,7 +77,8 @@ fun UtilityScreen(
                 targetCurrency = targetCurrency,
                 rate = mainRate,
                 lastUpdated = lastUpdated,
-                decimalPlaces = decimalPlaces
+                decimalPlaces = decimalPlaces,
+                previousRate = previousRates[targetCurrency]
             )
 
             // Secondary information: the other currencies, separated by dividers

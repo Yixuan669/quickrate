@@ -25,4 +25,15 @@ interface ExchangeRateApiService {
         @Query("base") base: String,
         @Query("quotes") quotes: String
     ): List<RateDto>
+
+    /**
+     * Gets daily rates from the [from] date (format yyyy-MM-dd) until today.
+     * Used to compare today's rate with the previous day's.
+     */
+    @GET("v2/rates")
+    suspend fun getRateHistory(
+        @Query("base") base: String,
+        @Query("quotes") quotes: String,
+        @Query("from") from: String
+    ): List<RateDto>
 }

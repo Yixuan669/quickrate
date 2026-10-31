@@ -22,6 +22,7 @@ import retrofit2.HttpException
  */
 data class QuickRateUiState(
     val rates: Map<String, Double> = emptyMap(),
+    val previousRates: Map<String, Double> = emptyMap(),
     val targetCurrency: String = "CNY",
     val decimalPlaces: Int = 2,
     val lastUpdated: String = "",
@@ -51,8 +52,14 @@ class QuickRateViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val rates = rateRepository.getRates("SGD")
+                val previousRates = rateRepository.getPreviousRates("SGD")
                 _uiState.update {
-                    it.copy(rates = rates, lastUpdated = currentTime(), isLoading = false)
+                    it.copy(
+                        rates = rates,
+                        previousRates = previousRates,
+                        lastUpdated = currentTime(),
+                        isLoading = false
+                    )
                 }
             } catch (e: IOException) {
                 // No internet, or the connection dropped
